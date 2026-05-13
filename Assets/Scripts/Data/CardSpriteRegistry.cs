@@ -29,6 +29,7 @@ namespace Solitaire.Data
 
         public Sprite GetSprite(Suit suit, Rank rank)
         {
+            if (_lookup == null) Initialize();
             if (_lookup.TryGetValue((suit, rank), out var sprite))
                 return sprite;
 
