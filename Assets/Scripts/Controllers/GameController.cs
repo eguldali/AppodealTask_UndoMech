@@ -1,5 +1,7 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Solitaire.Commands;
+using Solitaire.Models;
 using Solitaire.Views;
 using UnityEngine;
 
@@ -7,9 +9,10 @@ namespace Solitaire.Controllers
 {
     public sealed class GameController
     {
-        private readonly GameModel       _gameModel;
-        private readonly UndoController  _undoController;
-        private readonly InputController _inputController;
+        private readonly GameModel                    _gameModel;
+        private readonly UndoController               _undoController;
+        private readonly InputController              _inputController;
+        private readonly Action<CardView, StackView>  _onCardDropped;
 
         public GameController(
             GameModel gameModel,
@@ -20,11 +23,12 @@ namespace Solitaire.Controllers
             _undoController  = undoController;
             _inputController = inputController;
 
-            inputController.OnCardDropped   += HandleDrop;
+            _onCardDropped = (c, s) => HandleDropAsync(c, s).Forget();
+            inputController.OnCardDropped   += _onCardDropped;
             inputController.OnUndoRequested += HandleUndo;
         }
 
-        private async void HandleDrop(CardView card, StackView targetStack)
+        private async UniTaskVoid HandleDropAsync(CardView card, StackView targetStack)
         {
             if (targetStack.StackModel == null)
             {
@@ -61,7 +65,7 @@ namespace Solitaire.Controllers
 
         public void Dispose()
         {
-            _inputController.OnCardDropped   -= HandleDrop;
+            _inputController.OnCardDropped   -= _onCardDropped;
             _inputController.OnUndoRequested -= HandleUndo;
         }
     }

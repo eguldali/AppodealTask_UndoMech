@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Solitaire.Models;
 using Solitaire.Views;
 using UnityEngine;
 

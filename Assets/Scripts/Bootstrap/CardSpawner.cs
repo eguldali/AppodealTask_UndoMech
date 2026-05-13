@@ -1,4 +1,6 @@
 using Solitaire.Controllers;
+using Solitaire.Data.Enums;
+using Solitaire.Models;
 using Solitaire.Views;
 using UnityEngine;
 using UnityEngine.UI;

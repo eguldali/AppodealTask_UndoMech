@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 
-public sealed class StackModel
+namespace Solitaire.Models
 {
-    private readonly List<CardModel> _cards = new();
+    public sealed class StackModel
+    {
+        private readonly List<CardModel> _cards = new();
 
-    public int Count => _cards.Count;
+        public int Count => _cards.Count;
 
-    public void Add(CardModel card)     => _cards.Add(card);
-    public void Remove(CardModel card)  => _cards.Remove(card);
-    public bool Contains(CardModel card)=> _cards.Contains(card);
+        public void Add(CardModel card)      => _cards.Add(card);
+        public void Remove(CardModel card)   => _cards.Remove(card);
+        public bool Contains(CardModel card) => _cards.Contains(card);
 
-    public CardModel Peek() => _cards.Count > 0 ? _cards[^1] : null;
+        public CardModel Peek() => _cards.Count > 0 ? _cards[^1] : null;
+    }
 }

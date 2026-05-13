@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Solitaire.Models;
 using UnityEngine;
 using UnityEngine.UI;
 

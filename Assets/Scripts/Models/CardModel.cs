@@ -1,12 +1,17 @@
-public sealed class CardModel
-{
-    public Suit Suit     { get; }
-    public Rank Rank     { get; }
-    public bool IsFaceUp { get; set; }
+using Solitaire.Data.Enums;
 
-    public CardModel(Suit suit, Rank rank)
+namespace Solitaire.Models
+{
+    public sealed class CardModel
     {
-        Suit = suit;
-        Rank = rank;
+        public Suit Suit     { get; }
+        public Rank Rank     { get; }
+        public bool IsFaceUp { get; set; }
+
+        public CardModel(Suit suit, Rank rank)
+        {
+            Suit = suit;
+            Rank = rank;
+        }
     }
 }

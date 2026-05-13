@@ -1,23 +1,26 @@
-public sealed class GameModel
+namespace Solitaire.Models
 {
-    private StackModel[] _stacks;
-
-    public void Initialize(StackModel[] stacks)
+    public sealed class GameModel
     {
-        _stacks = stacks;
-    }
+        private StackModel[] _stacks;
 
-    public StackModel FindStack(CardModel card)
-    {
-        foreach (var stack in _stacks)
-            if (stack.Contains(card)) return stack;
+        public void Initialize(StackModel[] stacks)
+        {
+            _stacks = stacks;
+        }
 
-        return null;
-    }
+        public StackModel FindStack(CardModel card)
+        {
+            foreach (var stack in _stacks)
+                if (stack.Contains(card)) return stack;
 
-    public bool IsValidMove(CardModel card, StackModel destination)
-    {
-        var source = FindStack(card);
-        return source != null && source != destination;
+            return null;
+        }
+
+        public bool IsValidMove(CardModel card, StackModel destination)
+        {
+            var source = FindStack(card);
+            return source != null && source != destination;
+        }
     }
 }

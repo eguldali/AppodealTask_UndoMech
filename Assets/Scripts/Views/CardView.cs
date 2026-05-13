@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Solitaire.Controllers;
 using Solitaire.Data;
+using Solitaire.Models;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -54,16 +54,13 @@ namespace Solitaire.Views
         public void SetStack(StackView stack)              => _currentStack      = stack;
         public void SetInputController(InputController ic) => _inputController   = ic;
 
-        private UniTaskCompletionSource _moveTcs;
-
         public UniTask MoveToAsync(Vector3 worldPos, float duration = 0.3f)
         {
-            _moveTcs?.TrySetResult(); // let any awaiting continuation proceed immediately
-            transform.DOKill();       // stop the in-progress tween
+            transform.DOKill();
             var tcs = new UniTaskCompletionSource();
-            _moveTcs = tcs;
             transform.DOMove(worldPos, duration)
                      .SetEase(Ease.OutCubic)
+                     .SetLink(gameObject)
                      .OnComplete(() => tcs.TrySetResult());
             return tcs.Task;
         }
@@ -97,7 +94,9 @@ namespace Solitaire.Views
                 _dragGroup[i].transform.position = worldPos + _dragOffsets[i];
         }
 
-        public async void OnEndDrag(PointerEventData eventData)
+        public void OnEndDrag(PointerEventData eventData) => OnEndDragAsync(eventData).Forget();
+
+        private async UniTaskVoid OnEndDragAsync(PointerEventData eventData)
         {
             foreach (var card in _dragGroup)
                 card._canvasGroup.blocksRaycasts = true;
@@ -112,30 +111,16 @@ namespace Solitaire.Views
                 if (targetStack != null) break;
             }
 
-            if (targetStack != null)
+            if (targetStack != null && _inputController != null)
             {
-                if (_inputController != null)
-                {
-                    _inputController.NotifyCardDropped(this, targetStack);
-                }
-                else
-                {
-                    if (_currentStack != null) _currentStack.RemoveCardsFrom(this);
-                    foreach (var card in _dragGroup)
-                        targetStack.AddCard(card);
-                }
+                _inputController.NotifyCardDropped(this, targetStack);
             }
             else
             {
-                for (int i = 0; i < _dragGroup.Count; i++)
-                    SnapBackAsync(_dragGroup[i], i * 0.05f).Forget();
+                foreach (var card in _dragGroup)
+                    card.MoveToAsync(card.OriginalPosition).Forget();
             }
         }
 
-        private async UniTask SnapBackAsync(CardView card, float delaySeconds)
-        {
-            await UniTask.Delay(TimeSpan.FromSeconds(delaySeconds));
-            await card.MoveToAsync(card._originalPosition);
-        }
     }
 }

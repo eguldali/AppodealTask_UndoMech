@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Solitaire.Data.Enums;
 using UnityEngine;
 
 namespace Solitaire.Data

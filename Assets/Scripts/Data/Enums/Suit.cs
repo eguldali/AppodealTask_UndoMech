@@ -1,7 +1,10 @@
-public enum Suit
+namespace Solitaire.Data.Enums
 {
-    Clubs,
-    Diamonds,
-    Hearts,
-    Spades
+    public enum Suit
+    {
+        Clubs,
+        Diamonds,
+        Hearts,
+        Spades
+    }
 }

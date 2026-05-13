@@ -1,6 +1,9 @@
-public enum Rank
+namespace Solitaire.Data.Enums
 {
-    Ace = 1,
-    Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten,
-    Jack, Queen, King
+    public enum Rank
+    {
+        Ace = 1,
+        Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten,
+        Jack, Queen, King
+    }
 }
