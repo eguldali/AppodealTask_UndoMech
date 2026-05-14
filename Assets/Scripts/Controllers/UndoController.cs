@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Solitaire.Commands;
@@ -8,6 +9,8 @@ namespace Solitaire.Controllers
     {
         private readonly Stack<ICommand> _history = new();
         private bool _isBusy = false;
+
+        public event Action OnHistoryChanged;
 
         public bool CanUndo => _history.Count > 0;
 
@@ -23,6 +26,7 @@ namespace Solitaire.Controllers
             finally
             {
                 _isBusy = false;
+                OnHistoryChanged?.Invoke();
             }
         }
 
@@ -37,6 +41,7 @@ namespace Solitaire.Controllers
             finally
             {
                 _isBusy = false;
+                OnHistoryChanged?.Invoke();
             }
         }
     }

@@ -34,7 +34,7 @@ namespace Solitaire.Bootstrap
                 _stockView, _wasteView, _foundationView);
 
             // STEP 3 — Bind undo button
-            _undoButton.Bind(inputController);
+            _undoButton.Bind(inputController, undoController);
 
             // STEP 4 — Initialize views
             for (int i = 0; i < _stackViews.Length; i++)
