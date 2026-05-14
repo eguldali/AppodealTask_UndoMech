@@ -104,7 +104,7 @@ Controls:
 
 **Architecture**
 - `CardView` currently handles display, drag gesture, group assembly, raycasting, and animation — this violates SRP. I would extract a `CardDragHandler` component to isolate input from display
-- `CardSpriteRegistry` is directly serialized on the `CardView` prefab. In production it would be loaded via Addressables at runtime and released when no longer needed — the infrastructure (Addressables package, asset groups) is already in the project
+- `CardSpriteRegistry` is directly serialized on the `CardView` prefab. In production it would be loaded via Addressables at runtime and released when no longer needed. Addressables integration was scoped during the architecture phase but excluded to keep the prototype minimal — the package and asset groups remain in the project as groundwork for a future build
 
 **Gameplay**
 - Proper Klondike rules — red/black alternation, descending rank validation
@@ -154,8 +154,8 @@ I ran two structured code reviews using an `engineering:code-review` prompt agai
 - Missing concurrency guard in `UndoController` (fixed → `_isBusy` flag)
 - Fallback path in `OnEndDrag` that bypassed the Command Pattern (removed)
 - Missing `SetLink` on DOTween tweens (fixed)
-- `GroupDragCommand` not transferring follower `CardModel`s between `StackModel`s (fixed)
-- Dead `MoveGroupCommand` class (removed)
+- `GroupDragCommand` not transferring follower `CardModel`s between `StackModel`s — identified here, fixed in a subsequent refactor pass
+- Dead `MoveGroupCommand` class — identified here, removed in the same refactor pass
 
 I triaged findings by severity — fixed Critical and Major issues, documented Minor ones in this README as future improvements.
 
