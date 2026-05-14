@@ -65,6 +65,12 @@ namespace Solitaire.Views
         public void SetDraggable(bool draggable) =>
             _canvasGroup.blocksRaycasts = draggable;
 
+        public void SnapBack()
+        {
+            transform.SetParent(_originalParent);
+            MoveToAsync(_originalPosition).Forget();
+        }
+
         public UniTask MoveToAsync(Vector3 worldPos, float duration = 0.3f)
         {
             transform.DOKill();

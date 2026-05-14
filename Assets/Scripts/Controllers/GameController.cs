@@ -51,8 +51,12 @@ namespace Solitaire.Controllers
             var fromContainer = FindSourceContainer(card);
             var fromStack     = _gameModel.FindStack(card.CardModel);
 
-            if (fromStack == targetStack.StackModel) return;
-            if (!_gameModel.IsValidMove(card.CardModel, targetStack.StackModel)) return;
+            if (fromStack == targetStack.StackModel || !_gameModel.IsValidMove(card.CardModel, targetStack.StackModel))
+            {
+                foreach (var c in card.DragGroup)
+                    c.SnapBack();
+                return;
+            }
 
             var dragGroup = card.DragGroup;
             var followers = new List<CardView>(dragGroup.Count - 1);
@@ -67,7 +71,8 @@ namespace Solitaire.Controllers
                 wasteFrom);
 
             ICommand cmd = followers.Count > 0
-                ? new GroupDragCommand(mainCmd, followers, fromContainer, targetStack)
+                ? new GroupDragCommand(mainCmd, followers, fromContainer, targetStack,
+                                       fromStack, targetStack.StackModel)
                 : mainCmd;
             await _undoController.ExecuteAsync(cmd);
         }
