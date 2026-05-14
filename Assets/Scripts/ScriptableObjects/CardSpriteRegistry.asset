@@ -50,6 +50,6 @@ MonoBehaviour:
     rank: 12
     sprite: {fileID: 880976105667807341, guid: 451a7b322f19a4a1c9d38129d56e82a3, type: 3}
   - suit: 2
-    rank: 12
+    rank: 13
     sprite: {fileID: 880976105667807341, guid: 451a7b322f19a4a1c9d38129d56e82a3, type: 3}
   backSprite: {fileID: -3760630615861493005, guid: 451a7b322f19a4a1c9d38129d56e82a3, type: 3}

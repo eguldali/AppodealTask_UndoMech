@@ -5,35 +5,35 @@ using UnityEngine;
 
 namespace Solitaire.Commands
 {
-    public sealed class MoveCardCommand : ICommand
+    public sealed class FoundationMoveCommand : ICommand
     {
-        private readonly CardModel      _card;
-        private readonly StackModel     _from;
-        private readonly StackModel     _to;
-        private readonly WasteModel     _wasteFrom;
-        private readonly ICardContainer _fromContainer;
-        private readonly ICardContainer _toContainer;
-        private readonly CardView       _view;
-        private readonly Vector3        _originPos;
-        private readonly Vector3        _targetPos;
-        private readonly Transform      _originalParent;
+        private readonly CardModel       _card;
+        private readonly StackModel      _from;
+        private readonly FoundationModel _to;
+        private readonly WasteModel      _wasteFrom;
+        private readonly CardView        _view;
+        private readonly ICardContainer  _fromContainer;
+        private readonly FoundationView  _toView;
+        private readonly Vector3         _originPos;
+        private readonly Vector3         _targetPos;
+        private readonly Transform       _originalParent;
 
         private bool     _didFlipSourceTop;
         private CardView _sourceTopCard;
 
-        public MoveCardCommand(
-            CardModel card, StackModel from, StackModel to,
-            ICardContainer fromContainer, ICardContainer toContainer,
-            CardView view, Vector3 originPos, Vector3 targetPos,
+        public FoundationMoveCommand(
+            CardModel card, StackModel from, FoundationModel to,
+            CardView view, ICardContainer fromContainer, FoundationView toView,
+            Vector3 originPos, Vector3 targetPos,
             WasteModel wasteFrom = null)
         {
             _card           = card;
             _from           = from;
             _to             = to;
             _wasteFrom      = wasteFrom;
-            _fromContainer  = fromContainer;
-            _toContainer    = toContainer;
             _view           = view;
+            _fromContainer  = fromContainer;
+            _toView         = toView;
             _originPos      = originPos;
             _targetPos      = targetPos;
             _originalParent = view.transform.parent;
@@ -45,8 +45,8 @@ namespace Solitaire.Commands
             _wasteFrom?.Pop();
             _from?.Remove(_card);
             _to.Add(_card);
+            _toView.RegisterCard(_view);
             await _view.MoveToAsync(_targetPos);
-            _toContainer.AddCard(_view);
 
             var newTop = _fromContainer?.GetTopCardView();
             if (newTop != null && !newTop.CardModel.IsFaceUp)
@@ -67,13 +67,14 @@ namespace Solitaire.Commands
                 _didFlipSourceTop = false;
             }
 
-            _toContainer.RemoveCard(_view);
-            _to.Remove(_card);
+            _toView.UnregisterCard(_view);
+            _to.Remove();
             _from?.Add(_card);
             _wasteFrom?.Push(_card);
             _view.transform.SetParent(_originalParent, true);
             await _view.MoveToAsync(_originPos);
             _fromContainer?.AddCard(_view);
+            _view.SetDraggable(true);
         }
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace Solitaire.Views
 {
     [RequireComponent(typeof(Image))]
-    public sealed class StackView : MonoBehaviour
+    public sealed class StackView : MonoBehaviour, ICardContainer
     {
         [SerializeField] private Transform _slotContainer;
 
@@ -61,8 +61,10 @@ namespace Solitaire.Views
             _cardViews.RemoveRange(index, _cardViews.Count - index);
         }
 
+        public CardView GetTopCardView()         => _cardViews.Count > 0 ? _cardViews[^1] : null;
         public int     CardCount                => _cardViews.Count;
         public Vector3 GetSlotPosition(int i)   => _slotContainer.position + Vector3.down * (i * 30f);
         public Vector3 GetNextSlotPosition()    => GetSlotPosition(_cardViews.Count);
+        public Vector3 GetTopSlotPosition()     => GetNextSlotPosition();
     }
 }

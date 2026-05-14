@@ -20,6 +20,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96223caaef32b400a9b04c7253a7b63f
+    m_Address: Assets/Scripts/ScriptableObjects/CardSpriteRegistry.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: a3a27fc5ebdf241de8e3cb8a5e5b31d8, type: 2}
   m_SchemaSet:

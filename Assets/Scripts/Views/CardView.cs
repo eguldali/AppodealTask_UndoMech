@@ -18,20 +18,22 @@ namespace Solitaire.Views
         [SerializeField] private CardSpriteRegistry _registry;
         [SerializeField] private Image              _frontImage;
         [SerializeField] private Image              _backImage;
+
         private InputController _inputController;
+        private CardModel       _cardModel;
+        private Canvas          _canvas;
+        private CanvasGroup     _canvasGroup;
+        private RectTransform   _rectTransform;
+        private StackView       _currentStack;
+        private Vector3         _originalPosition;
+        private Transform       _originalParent;
+        private List<CardView>  _dragGroup;
+        private List<Vector3>   _dragOffsets;
 
-        private CardModel      _cardModel;
-        private Canvas         _canvas;
-        private CanvasGroup    _canvasGroup;
-        private RectTransform  _rectTransform;
-        private StackView      _currentStack;
-        private Vector3        _originalPosition;
-        private List<CardView> _dragGroup;
-        private List<Vector3>  _dragOffsets;
-
-        public CardModel CardModel     => _cardModel;
-        public Vector3   OriginalPosition => _originalPosition;
-        public IReadOnlyList<CardView> DragGroup => _dragGroup;
+        public CardModel                   CardModel         => _cardModel;
+        public Vector3                     OriginalPosition  => _originalPosition;
+        public List<CardView>              DragGroup         => _dragGroup ?? new List<CardView> { this };
+        public StackView                   CurrentStack      => _currentStack;
 
         private void Awake()
         {
@@ -40,19 +42,28 @@ namespace Solitaire.Views
             _rectTransform = GetComponent<RectTransform>();
         }
 
-        public void Initialize(CardModel model)
+        public void Initialize(CardModel model, InputController inputController)
         {
             _cardModel        = model;
+            _inputController  = inputController;
             _originalPosition = transform.position;
 
             _frontImage.sprite = _registry.GetSprite(model.Suit, model.Rank);
             _backImage.sprite  = _registry.GetBackSprite();
         }
 
-        public StackView CurrentStack => _currentStack;
+        public void SetStack(StackView stack)              => _currentStack  = stack;
+        public void SetInputController(InputController ic) => _inputController = ic;
 
-        public void SetStack(StackView stack)              => _currentStack      = stack;
-        public void SetInputController(InputController ic) => _inputController   = ic;
+        public void SetFaceUp(bool faceUp)
+        {
+            _frontImage.enabled =  faceUp;
+            _backImage.enabled  = !faceUp;
+            _cardModel.IsFaceUp =  faceUp;
+        }
+
+        public void SetDraggable(bool draggable) =>
+            _canvasGroup.blocksRaycasts = draggable;
 
         public UniTask MoveToAsync(Vector3 worldPos, float duration = 0.3f)
         {
@@ -75,7 +86,9 @@ namespace Solitaire.Views
             for (int i = 0; i < _dragGroup.Count; i++)
             {
                 _dragGroup[i]._originalPosition = _dragGroup[i].transform.position;
+                _dragGroup[i]._originalParent   = _dragGroup[i].transform.parent;
                 _dragOffsets.Add(_dragGroup[i].transform.position - transform.position);
+                _dragGroup[i].transform.SetParent(_canvas.transform);
                 _dragGroup[i].transform.SetAsLastSibling();
                 _dragGroup[i]._canvasGroup.blocksRaycasts = false;
             }
@@ -104,23 +117,41 @@ namespace Solitaire.Views
             var results = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, results);
 
-            StackView targetStack = null;
+            StackView      targetStack    = null;
+            FoundationView foundationView = null;
             foreach (var result in results)
             {
-                targetStack = result.gameObject.GetComponent<StackView>();
-                if (targetStack != null) break;
+                if (targetStack    == null) targetStack    = result.gameObject.GetComponent<StackView>();
+                if (foundationView == null) foundationView = result.gameObject.GetComponent<FoundationView>();
             }
 
             if (targetStack != null && _inputController != null)
             {
                 _inputController.NotifyCardDropped(this, targetStack);
             }
+            else if (foundationView != null && _inputController != null)
+            {
+                if (_dragGroup.Count > 1)
+                {
+                    foreach (var card in _dragGroup)
+                    {
+                        card.transform.SetParent(card._originalParent);
+                        card.MoveToAsync(card.OriginalPosition).Forget();
+                    }
+                }
+                else
+                {
+                    _inputController.NotifyCardDroppedOnFoundation(this, foundationView);
+                }
+            }
             else
             {
                 foreach (var card in _dragGroup)
+                {
+                    card.transform.SetParent(card._originalParent);
                     card.MoveToAsync(card.OriginalPosition).Forget();
+                }
             }
         }
-
     }
 }
