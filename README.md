@@ -105,6 +105,8 @@ Controls:
 **Architecture**
 - `CardView` currently handles display, drag gesture, group assembly, raycasting, and animation — this violates SRP. I would extract a `CardDragHandler` component to isolate input from display
 - `CardSpriteRegistry` is directly serialized on the `CardView` prefab. In production it would be loaded via Addressables at runtime and released when no longer needed. Addressables integration was scoped during the architecture phase but excluded to keep the prototype minimal — the package and asset groups remain in the project as groundwork for a future build
+- View GameObjects (`StackView`, `StockView`, `WasteView`, `FoundationView`) are placed directly in the scene for prototype convenience. In production these should be proper prefabs — instantiated at runtime and configured via data rather than hard-wired in the scene hierarchy
+- `GameBootstrapper` currently handles dependency wiring, deck construction, shuffle, and deal logic inside a single `Start()` method. This violates SRP and makes the session flow untestable in isolation. Deck building and dealing should move to a dedicated `GameManager` or `SessionManager`, leaving `GameBootstrapper` as a pure composition root
 
 **Gameplay**
 - Proper Klondike rules — red/black alternation, descending rank validation
